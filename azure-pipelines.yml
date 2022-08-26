@@ -1,4 +1,4 @@
-# Starter pipeline
+# Starter pipeline    
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
@@ -16,7 +16,7 @@ variables:
   webAppName: 'piplineproject'
 
   # Environment name
-  environmentName: 'flask-ml-service'
+  environmentName: 'Flask-Ml-Deploy'
 
   # Project root folder. Point to the folder containing manage.py file.
   projectRoot: $(System.DefaultWorkingDirectory)
@@ -33,12 +33,14 @@ stages:
         python3.7 -m pip install setup
         python3.7 -m pip install -r requirements.txt
       workingDirectory: $(projectRoot)
+
     - script: |
         export PATH=$HOME/.local/bin:$PATH
         make install
         make lint
       workingDirectory: $(projectRoot)
       displayName: 'Run lint tests'
+
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
@@ -51,6 +53,7 @@ stages:
     - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
       displayName: 'Upload package'
       artifact: drop
+
 - stage: Deploy
   displayName: 'Deploy Web App'
   dependsOn: Build
@@ -64,8 +67,8 @@ stages:
         deploy:
           steps:
           - task: AzureWebApp@1
-            displayName: 'Deploy Azure Web App : flask-ml-service'
+            displayName: 'Deploy Azure Web App : Flask-Ml-Deploy'
             inputs:
-              azureSubscription: $(d63f8116-7a20-4117-80f3-6b57296b37a5)
+              azureSubscription: $(azureServiceConnectionId)
               appName: $(webAppName)
               package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
